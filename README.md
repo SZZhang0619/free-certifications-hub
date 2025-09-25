@@ -2,8 +2,8 @@
 
 > 精選全球最優質的免費認證課程，涵蓋雲端運算、網路安全、資料庫管理、專案管理、數位行銷等熱門領域
 
-[![Deploy to GitHub Pages](https://github.com/SZZhang0619/free-certifications-hub/actions/workflows/deploy.yml/badge.svg)](https://github.com/SZZhang0619/free-certifications-hub/actions/workflows/deploy.yml)
-[![Sync Data](https://github.com/SZZhang0619/free-certifications-hub/actions/workflows/sync-data.yml/badge.svg)](https://github.com/SZZhang0619/free-certifications-hub/actions/workflows/sync-data.yml)
+[![Deploy to GitHub Pages](https://github.com/SZZhang0619/free-certifications-hub/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/SZZhang0619/free-certifications-hub/actions/workflows/deploy.yml)
+[![Sync Free Certifications Data](https://github.com/SZZhang0619/free-certifications-hub/actions/workflows/sync-data.yml/badge.svg?branch=main)](https://github.com/SZZhang0619/free-certifications-hub/actions/workflows/sync-data.yml)
 
 ## 🌟 專案特色
 
