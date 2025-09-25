@@ -2,8 +2,8 @@
 
 > 精選全球最優質的免費認證課程，涵蓋雲端運算、網路安全、資料庫管理、專案管理、數位行銷等熱門領域
 
-[![Deploy to GitHub Pages](https://github.com/YOUR_USERNAME/free-certifications-hub/actions/workflows/deploy.yml/badge.svg)](https://github.com/YOUR_USERNAME/free-certifications-hub/actions/workflows/deploy.yml)
-[![Sync Data](https://github.com/YOUR_USERNAME/free-certifications-hub/actions/workflows/sync-data.yml/badge.svg)](https://github.com/YOUR_USERNAME/free-certifications-hub/actions/workflows/sync-data.yml)
+[![Deploy to GitHub Pages](https://github.com/SZZhang0619/free-certifications-hub/actions/workflows/deploy.yml/badge.svg)](https://github.com/SZZhang0619/free-certifications-hub/actions/workflows/deploy.yml)
+[![Sync Data](https://github.com/SZZhang0619/free-certifications-hub/actions/workflows/sync-data.yml/badge.svg)](https://github.com/SZZhang0619/free-certifications-hub/actions/workflows/sync-data.yml)
 
 ## 🌟 專案特色
 
@@ -55,7 +55,7 @@
 
 ### 1. 克隆專案
 ```bash
-git clone https://github.com/YOUR_USERNAME/free-certifications-hub.git
+git clone https://github.com/SZZhang0619/free-certifications-hub.git
 cd free-certifications-hub
 ```
 
@@ -175,11 +175,11 @@ free-certifications-hub/
 ## 📞 聯絡資訊
 
 如有問題或建議，請：
-- 開啟 [Issue](https://github.com/YOUR_USERNAME/free-certifications-hub/issues)
-- 提交 [Pull Request](https://github.com/YOUR_USERNAME/free-certifications-hub/pulls)
+- 開啟 [Issue](https://github.com/SZZhang0619/free-certifications-hub/issues)
+- 提交 [Pull Request](https://github.com/SZZhang0619/free-certifications-hub/pulls)
 
 ---
 
 ⭐ 如果這個專案對您有幫助，請給我們一個星星！
 
-🌐 **線上預覽：** https://YOUR_USERNAME.github.io/free-certifications-hub/
+🌐 **線上預覽：** https://SZZhang0619.github.io/free-certifications-hub/
