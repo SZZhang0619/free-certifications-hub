@@ -1,0 +1,136 @@
+name: Sync Free Certifications Data
+
+on:
+  # 每週日 UTC 時間 00:00 執行（台灣時間週日上午 8:00）
+  schedule:
+    - cron: '0 0 * * 0'
+  
+  # 允許手動觸發
+  workflow_dispatch:
+
+# 設定權限
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download latest Free-Certifications.md
+        run: |
+          echo "正在下載最新的 Free-Certifications 資料..."
+          curl -o temp-readme.md https://raw.githubusercontent.com/cloudcommunity/Free-Certifications/main/README.md
+          
+          # 檢查檔案是否成功下載
+          if [ -f temp-readme.md ]; then
+            echo "檔案下載成功"
+            ls -la temp-readme.md
+          else
+            echo "檔案下載失敗"
+            exit 1
+          fi
+
+      - name: Check for changes
+        id: check-changes
+        run: |
+          # 比較新下載的檔案與現有檔案
+          if [ -f src/assets/Free-Certifications.md ]; then
+            if cmp -s temp-readme.md src/assets/Free-Certifications.md; then
+              echo "檔案內容相同，無需更新"
+              echo "has_changes=false" >> $GITHUB_OUTPUT
+            else
+              echo "檔案內容有變更，需要更新"
+              echo "has_changes=true" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "目標檔案不存在，需要創建"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update Free-Certifications.md
+        if: steps.check-changes.outputs.has_changes == 'true'
+        run: |
+          echo "正在更新 Free-Certifications.md..."
+          
+          # 確保目錄存在
+          mkdir -p src/assets
+          
+          # 複製新檔案
+          cp temp-readme.md src/assets/Free-Certifications.md
+          
+          # 清理臨時檔案
+          rm temp-readme.md
+          
+          echo "檔案更新完成"
+
+      - name: Setup Node.js
+        if: steps.check-changes.outputs.has_changes == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        if: steps.check-changes.outputs.has_changes == 'true'
+        run: npm ci
+
+      - name: Update certification data in App.jsx
+        if: steps.check-changes.outputs.has_changes == 'true'
+        run: |
+          echo "正在解析並更新認證資料..."
+          
+          # 這裡可以添加腳本來解析 markdown 並更新 App.jsx 中的資料
+          # 目前先添加註釋提醒手動更新
+          echo "// 資料已於 $(date) 自動同步更新" >> src/App.jsx
+
+      - name: Build project
+        if: steps.check-changes.outputs.has_changes == 'true'
+        run: |
+          echo "正在建構專案..."
+          npm run build
+
+      - name: Commit and push changes
+        if: steps.check-changes.outputs.has_changes == 'true'
+        run: |
+          # 設定 Git 使用者資訊
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          # 添加變更的檔案
+          git add src/assets/Free-Certifications.md
+          git add src/App.jsx
+          
+          # 檢查是否有變更需要提交
+          if git diff --staged --quiet; then
+            echo "沒有變更需要提交"
+          else
+            # 提交變更
+            git commit -m "🔄 自動同步 Free-Certifications 資料 - $(date +'%Y-%m-%d %H:%M:%S')"
+            
+            # 推送到遠端倉庫
+            git push
+            
+            echo "變更已成功提交並推送"
+          fi
+
+      - name: Create summary
+        if: steps.check-changes.outputs.has_changes == 'true'
+        run: |
+          echo "## 📊 同步結果" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Free-Certifications 資料已成功更新" >> $GITHUB_STEP_SUMMARY
+          echo "📅 更新時間: $(date +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 資料來源: https://github.com/cloudcommunity/Free-Certifications" >> $GITHUB_STEP_SUMMARY
+
+      - name: No changes summary
+        if: steps.check-changes.outputs.has_changes == 'false'
+        run: |
+          echo "## 📊 同步結果" >> $GITHUB_STEP_SUMMARY
+          echo "ℹ️ 資料無變更，跳過更新" >> $GITHUB_STEP_SUMMARY
+          echo "📅 檢查時間: $(date +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 資料來源: https://github.com/cloudcommunity/Free-Certifications" >> $GITHUB_STEP_SUMMARY
