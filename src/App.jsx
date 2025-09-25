@@ -8,61 +8,102 @@ import { Search, ExternalLink, Star, Users, Award, BookOpen, Shield, Database, B
 import * as THREE from 'three'
 import p5 from 'p5'
 import Rellax from 'rellax'
+import certificationsMarkdown from '@/assets/Free-Certifications.md?raw'
 import './App.css'
 
-// 認證資料結構
-const certificationData = {
-  general: [
-    { title: "GitLab Certification", provider: "GitLab", description: "免費認證路徑和徽章", link: "https://about.gitlab.com/learn/", expiration: "無限期", category: "DevOps" },
-    { title: "Oracle Cloud Infrastructure", provider: "Oracle", description: "Oracle 雲端基礎設施認證", link: "https://education.oracle.com/oracle-oci-certification", expiration: "無限期", category: "雲端" },
-    { title: "Machine Learning with Python", provider: "freeCodeCamp", description: "免費機器學習課程與認證", link: "https://www.freecodecamp.org/learn/machine-learning-with-python/", expiration: "無限期", category: "AI/ML" },
-    { title: "Data Visualization", provider: "freeCodeCamp", description: "免費資料視覺化課程與認證", link: "https://www.freecodecamp.org/learn/data-visualization/", expiration: "無限期", category: "資料科學" },
-    { title: "AI Fundamentals", provider: "Databricks", description: "生成式 AI 基礎課程", link: "https://www.databricks.com/resources/learn/training/generative-ai-fundamentals", expiration: "無限期", category: "AI/ML" },
-    { title: "Azure Developer Challenge", provider: "Microsoft", description: "學習在 Microsoft Azure 上設計、建構、測試和維護雲端應用程式", link: "https://docs.microsoft.com/en-us/learn/challenges", expiration: "有限時間", category: "雲端" },
-    { title: "JumpCloud Core Certification", provider: "JumpCloud", description: "免費 JumpCloud 核心認證（價值 $150）", link: "https://jumpcloud.com/university/certifications/core", expiration: "有限時間", category: "身份管理" },
-    { title: "AWS Cloud Quest", provider: "AWS", description: "AWS 雲端探索：雲端從業者", link: "https://explore.skillbuilder.aws/learn/course/11458/aws-cloud-quest-cloud-practitioner", expiration: "無限期", category: "雲端" },
-    { title: "Postman API Fundamentals", provider: "Postman", description: "Postman API 基礎學生專家認證", link: "https://academy.postman.com/path/postman-api-fundamentals-student-expert", expiration: "無限期", category: "API" },
-    { title: "Neo4j Certified Professional", provider: "Neo4j", description: "成為 Neo4j 認證專業人員", link: "https://neo4j.com/graphacademy/neo4j-certification/", expiration: "無限期", category: "資料庫" }
-  ],
-  security: [
-    { title: "Ethical Hacking Certificate", provider: "Cisco", description: "思科道德駭客認證", link: "https://www.netacad.com/courses/ethical-hacker", expiration: "無限期", category: "網路安全" },
-    { title: "Cybersecurity Operations Fundamentals", provider: "Cisco", description: "思科網路安全營運基礎（30 學分）", link: "https://u.cisco.com/path/32", expiration: "2023-11-16", category: "網路安全" },
-    { title: "Certified in Cybersecurity", provider: "ISC²", description: "網路安全認證考試券（100% 免費）", link: "https://www.isc2.org/landing/1mcc", expiration: "2024-12-31", category: "網路安全" },
-    { title: "Network Security Training", provider: "Fortinet", description: "Fortinet 免費網路安全訓練課程與認證", link: "https://www.fortinet.com/corporate/about-us/newsroom/press-releases/2020/fortinet-makes-all-online-cybersecurity-training-courses-available-for-free.html", expiration: "無限期", category: "網路安全" },
-    { title: "Introduction to Cybersecurity", provider: "Cisco Networking Academy", description: "網路安全入門課程與徽章", link: "https://www.netacad.com/courses/cybersecurity/introduction-cybersecurity", expiration: "無限期", category: "網路安全" },
-    { title: "ISO/IEC 27001 Information Security", provider: "SkillFront", description: "免費 ISO/IEC 27001 資訊安全助理認證", link: "https://www.skillfront.com/ISO-IEC-27001-Information-Security-Associate", expiration: "無限期", category: "資訊安全" },
-    { title: "Foundations of Purple Teaming", provider: "AttackIQ", description: "紫隊基礎課程", link: "https://www.academy.attackiq.com/courses/foundations-of-purple-teaming", expiration: "無限期", category: "網路安全" },
-    { title: "Security & Identity Fundamentals", provider: "Google Cloud", description: "Google Cloud 安全與身份基礎", link: "https://www.cloudskillsboost.google/course_templates/770", expiration: "無限期", category: "雲端安全" }
-  ],
-  databases: [
-    { title: "MongoDB University", provider: "MongoDB", description: "12 門免費 MongoDB 課程與完成證明", link: "https://university.mongodb.com/courses/catalog", expiration: "無限期", category: "NoSQL" },
-    { title: "CockroachDB Fundamentals", provider: "CockroachLab", description: "分散式資料庫核心概念與 CockroachDB 入門", link: "https://university.cockroachlabs.com/course/getting-started-with-cockroachdb", expiration: "無限期", category: "分散式資料庫" },
-    { title: "Redis Certified Developer", provider: "Redis", description: "Redis 認證開發者專業認證計畫", link: "https://university.redis.com/certification/", expiration: "無限期", category: "記憶體資料庫" },
-    { title: "Databricks Lakehouse Fundamentals", provider: "Databricks", description: "免費 Databricks 湖倉基礎訓練", link: "https://www.databricks.com/learn/training/lakehouse-fundamentals", expiration: "無限期", category: "大數據" },
-    { title: "Neo4j Graph Academy", provider: "Neo4j", description: "免費考試認證和課程完成證書", link: "https://graphacademy.neo4j.com", expiration: "無限期", category: "圖形資料庫" },
-    { title: "ArangoDB Certified Professional", provider: "ArangoDB", description: "ArangoDB 認證專業人員", link: "https://www.arangodb.com/learn/certification/", expiration: "無限期", category: "多模型資料庫" },
-    { title: "CrateDB Academy", provider: "CrateDB", description: "開源多模型資料庫免費線上課程與認證", link: "https://learn.cratedb.com", expiration: "無限期", category: "時序資料庫" }
-  ],
-  projectManagement: [
-    { title: "Scrum Foundations Professional Certificate", provider: "Certiprof", description: "免費 Scrum 基礎專業認證（使用代碼：COVID19Support）", link: "https://certiprof.com/pages/scrum-foundations-professional-certificate-sfpc-english", expiration: "無限期", category: "敏捷開發" },
-    { title: "Six Sigma White Belt", provider: "Six Sigma Online", description: "免費六標準差白帶訓練與認證", link: "https://www.sixsigmaonline.org/six-sigma-white-belt-certification/", expiration: "無限期", category: "品質管理" },
-    { title: "Project Management Essentials", provider: "OHSC", description: "牛津家庭學習中心免費專案管理課程與證書", link: "https://www.oxfordhomestudy.com/courses/project-management-courses-online/free-online-courses-with-certificates-in-project-management", expiration: "無限期", category: "專案管理" },
-    { title: "Scrum Fundamentals Certified", provider: "ScrumStudy", description: "免費 Scrum 基礎認證訓練課程", link: "https://www.scrumstudy.com/certification/scrum-fundamentals-certified", expiration: "無限期", category: "敏捷開發" },
-    { title: "Certified Associate In Scrum Fundamentals", provider: "SkillFront", description: "免費 Scrum 基礎助理認證", link: "https://www.skillfront.com/CASF-Certified-Associate-In-Scrum-Fundamentals", expiration: "無限期", category: "敏捷開發" }
-  ],
-  marketing: [
-    { title: "Fundamentals of Digital Marketing", provider: "Google", description: "Google 數位行銷基礎免費課程與證書", link: "https://learndigital.withgoogle.com/digitalgarage/course/digital-marketing", expiration: "無限期", category: "數位行銷" },
-    { title: "Microsoft Advertising Certification", provider: "Microsoft", description: "Microsoft 廣告認證與訓練", link: "https://about.ads.microsoft.com/en-us/resources/training/get-certified", expiration: "無限期", category: "廣告行銷" },
-    { title: "HubSpot Academy", provider: "HubSpot", description: "免費行銷與銷售課程與認證", link: "https://academy.hubspot.com/courses", expiration: "無限期", category: "入站行銷" },
-    { title: "SEMrush Academy", provider: "SEMrush", description: "免費線上數位行銷課程與考試", link: "https://www.semrush.com/academy/", expiration: "無限期", category: "SEO/SEM" },
-    { title: "Meta Certified Digital Marketing Associate", provider: "Meta", description: "Meta 認證數位行銷助理", link: "http://www.facebook.com/business/learn/certification/exams/100-101-exam", expiration: "無限期", category: "社群媒體" }
-  ]
+const SECTION_CONFIG = [
+  { heading: 'General', key: 'general', label: '綜合技術' },
+  { heading: 'Security', key: 'security', label: '網路安全' },
+  { heading: 'Databases', key: 'databases', label: '資料庫' },
+  { heading: 'Project Management', key: 'projectManagement', label: '專案管理' },
+  { heading: 'Marketing', key: 'marketing', label: '數位行銷' },
+  { heading: 'Miscellaneous', key: 'miscellaneous', label: '其他領域' }
+]
+
+const stripMarkdown = (value = '') =>
+  value
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\[(.*?)\]\((.*?)\)/g, '$1')
+    .replace(/_/g, ' ')
+    .replace(/`/g, '')
+    .trim()
+
+const extractLink = (cell = '') => {
+  const match = cell.match(/\(([^)]+)\)/)
+  return match ? match[1].trim() : ''
 }
+
+const normalizeExpiration = (value = '') => {
+  const normalized = value.toLowerCase()
+  if (normalized.includes('unlimited')) return '無限期'
+  if (normalized.includes('limited')) return '限時'
+  if (normalized.includes('unknown')) return '未知'
+  return value.trim()
+}
+
+const parseCertificationMarkdown = (markdown) => {
+  const result = Object.fromEntries(SECTION_CONFIG.map(({ key }) => [key, []]))
+  const sectionPattern = /## (.+?)\n([\s\S]*?)(?=\n## |$)/g
+  let match
+
+  while ((match = sectionPattern.exec(markdown)) !== null) {
+    const [, heading, body] = match
+    const section = SECTION_CONFIG.find((cfg) => cfg.heading === heading.trim())
+    if (!section) continue
+
+    const lines = body
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line.startsWith('|'))
+
+    for (const line of lines) {
+      const columns = line.split('|').slice(1, -1)
+      const cleaned = columns.map((col) => stripMarkdown(col))
+      if (!cleaned.length || ['Technology', 'Provider', '---'].includes(cleaned[0])) continue
+
+      let title
+      let provider
+      let description
+      let expiration
+      let linkCellRaw
+
+      if (cleaned.length >= 5) {
+        title = cleaned[0]
+        provider = cleaned[1]
+        description = cleaned[2]
+        expiration = cleaned[4] || ''
+        linkCellRaw = columns[3]
+      } else {
+        title = cleaned[0]
+        description = cleaned[1]
+        expiration = cleaned[3] || ''
+        provider = ''
+        linkCellRaw = columns[2]
+      }
+
+      const link = extractLink(linkCellRaw)
+      result[section.key].push({
+        title,
+        provider: provider || title,
+        description,
+        link,
+        expiration: normalizeExpiration(expiration),
+        category: section.label
+      })
+    }
+  }
+
+  return result
+}
+
+const certificationData = parseCertificationMarkdown(certificationsMarkdown)
+
+const DEFAULT_TAB = SECTION_CONFIG[0].key
 
 function App() {
   const [searchTerm, setSearchTerm] = useState('')
-  const [activeTab, setActiveTab] = useState('general')
-  const [filteredCerts, setFilteredCerts] = useState(certificationData.general)
+  const [activeTab, setActiveTab] = useState(DEFAULT_TAB)
+  const [filteredCerts, setFilteredCerts] = useState(certificationData[DEFAULT_TAB] || [])
   const threeRef = useRef()
   const p5Ref = useRef()
   const vantaRef = useRef()
@@ -260,7 +301,7 @@ function App() {
         
         document.head.appendChild(vantaScript)
       } catch (error) {
-        console.log('Vanta.js 載入失敗，使用替代效果')
+        console.error('Vanta.js 載入失敗，使用替代效果', error)
       }
     }
 
@@ -287,7 +328,7 @@ function App() {
         }
       }
     } catch (error) {
-      console.log('Rellax.js 初始化失敗')
+      console.error('Rellax.js 初始化失敗', error)
     }
   }, [])
 
@@ -323,12 +364,11 @@ function App() {
   useEffect(() => {
     const currentData = certificationData[activeTab] || []
     if (searchTerm) {
-      const filtered = currentData.filter(cert =>
-        cert.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        cert.provider.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        cert.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        cert.category.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      const keyword = searchTerm.toLowerCase()
+      const filtered = currentData.filter((cert) => {
+        const fields = [cert.title, cert.provider, cert.description, cert.category]
+        return fields.some((field) => (field || '').toLowerCase().includes(keyword))
+      })
       setFilteredCerts(filtered)
     } else {
       setFilteredCerts(currentData)
@@ -337,14 +377,14 @@ function App() {
 
   const getCategoryIcon = (category) => {
     const iconMap = {
-      'DevOps': <Sparkles className="w-4 h-4" />,
-      '雲端': <Globe className="w-4 h-4" />,
-      'AI/ML': <Brain className="w-4 h-4" />,
-      '資料科學': <TrendingUp className="w-4 h-4" />,
+      '綜合技術': <BookOpen className="w-4 h-4" />,
       '網路安全': <Shield className="w-4 h-4" />,
       '資料庫': <Database className="w-4 h-4" />,
       '專案管理': <Briefcase className="w-4 h-4" />,
-      '行銷': <TrendingUp className="w-4 h-4" />,
+      '數位行銷': <TrendingUp className="w-4 h-4" />,
+      '其他領域': <Sparkles className="w-4 h-4" />,
+      '雲端': <Globe className="w-4 h-4" />,
+      'AI/ML': <Brain className="w-4 h-4" />,
       'API': <Code className="w-4 h-4" />,
       '身份管理': <Zap className="w-4 h-4" />
     }
@@ -352,10 +392,16 @@ function App() {
   }
 
   const getExpirationBadge = (expiration) => {
+    if (!expiration) {
+      return null
+    }
+
     if (expiration === '無限期') {
       return <Badge variant="secondary" className="bg-green-100 text-green-800">無限期</Badge>
-    } else if (expiration === '有限時間') {
-      return <Badge variant="destructive">有限時間</Badge>
+    } else if (['有限時間', '限時'].includes(expiration)) {
+      return <Badge variant="destructive">{expiration}</Badge>
+    } else if (expiration === '未知') {
+      return <Badge variant="outline" className="border-gray-300 text-gray-600">未知</Badge>
     } else {
       return <Badge variant="outline" className="border-orange-300 text-orange-600">{expiration}</Badge>
     }
@@ -423,33 +469,21 @@ function App() {
         <section className="py-16 px-4 rellax" data-rellax-speed="-2">
           <div className="max-w-7xl mx-auto">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-5 mb-12 bg-white/90 backdrop-blur-sm rounded-2xl p-2 shadow-lg">
-                <TabsTrigger value="general" className="flex items-center gap-2 rounded-xl transition-all duration-300 hover:scale-105">
-                  <BookOpen className="w-4 h-4" />
-                  綜合技術
-                </TabsTrigger>
-                <TabsTrigger value="security" className="flex items-center gap-2 rounded-xl transition-all duration-300 hover:scale-105">
-                  <Shield className="w-4 h-4" />
-                  網路安全
-                </TabsTrigger>
-                <TabsTrigger value="databases" className="flex items-center gap-2 rounded-xl transition-all duration-300 hover:scale-105">
-                  <Database className="w-4 h-4" />
-                  資料庫
-                </TabsTrigger>
-                <TabsTrigger value="projectManagement" className="flex items-center gap-2 rounded-xl transition-all duration-300 hover:scale-105">
-                  <Briefcase className="w-4 h-4" />
-                  專案管理
-                </TabsTrigger>
-                <TabsTrigger value="marketing" className="flex items-center gap-2 rounded-xl transition-all duration-300 hover:scale-105">
-                  <TrendingUp className="w-4 h-4" />
-                  數位行銷
-                </TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6 mb-12 bg-white/90 backdrop-blur-sm rounded-2xl p-2 shadow-lg">
+                {SECTION_CONFIG.map(({ key, label }) => (
+                  <TabsTrigger key={key} value={key} className="flex items-center justify-center gap-2 rounded-xl transition-all duration-300 hover:scale-105">
+                    {getCategoryIcon(label)}
+                    {label}
+                  </TabsTrigger>
+                ))}
               </TabsList>
 
-              {Object.keys(certificationData).map((category) => (
-                <TabsContent key={category} value={category} className="mt-0">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredCerts.map((cert, index) => (
+              {SECTION_CONFIG.map(({ key }) => {
+                const tabData = key === activeTab ? filteredCerts : certificationData[key] || []
+                return (
+                  <TabsContent key={key} value={key} className="mt-0">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {tabData.map((cert, index) => (
                       <Card key={index} className="group hover:shadow-2xl transition-all duration-500 bg-white/95 backdrop-blur-sm border-0 shadow-lg hover:scale-105 hover:-translate-y-2 cursor-pointer animate-fade-in-up rellax" data-rellax-speed="-1">
                         <CardHeader className="pb-3">
                           <div className="flex items-start justify-between mb-2">
@@ -486,7 +520,7 @@ function App() {
                     ))}
                   </div>
                   
-                  {filteredCerts.length === 0 && (
+                  {key === activeTab && tabData.length === 0 && (
                     <div className="text-center py-16">
                       <div className="text-gray-400 mb-4">
                         <Search className="w-16 h-16 mx-auto mb-4" />
@@ -496,7 +530,8 @@ function App() {
                     </div>
                   )}
                 </TabsContent>
-              ))}
+                )
+              })}
             </Tabs>
           </div>
         </section>
@@ -534,7 +569,7 @@ function App() {
               立即選擇適合您的課程，投資您的未來！
             </p>
             <div className="flex flex-wrap justify-center gap-4 mb-8 rellax" data-rellax-speed="-2">
-              {['雲端運算', '人工智慧', '網路安全', '資料科學', 'DevOps', '專案管理'].map((tech, index) => (
+              {['雲端運算', '人工智慧', '網路安全', '資料科學', 'DevOps', '專案管理'].map((tech) => (
                 <Badge key={tech} variant="secondary" className="px-4 py-2 text-sm hover:scale-110 transition-transform duration-300 cursor-pointer">
                   {tech}
                 </Badge>
