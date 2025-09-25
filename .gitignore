@@ -144,7 +144,3 @@ build/
 *.tmp
 *.temp
 
-# Package manager lock files (keep only one)
-# yarn.lock
-# pnpm-lock.yaml
-package-lock.json
